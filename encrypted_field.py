@@ -20,12 +20,12 @@ class MyModel(models.Model):
 
 # Usage
 my_obj = MyModel()
-my_obj.b64_data = "hello"
-print(my_obj.b64_data)  # will output 'hello'
-print(my_obj.b64_data_enc)  # will output 'aGVsbG8=\n'
+my_obj.b64_data_clear = "hello"
+print(my_obj.b64_data_clear)  # will output 'hello'
+print(my_obj.b64_data)  # will output 'aGVsbG8=\n'
 """
 from __future__ import unicode_literals
-from south.modelsinspector import add_introspection_rules
+from south.modelsinspector import add_introspection_rules  # remove this line for django >= 1.7
 from django.db import models
 
 
@@ -48,9 +48,9 @@ class EncryptedField(models.TextField):
     def contribute_to_class(self, cls, name):
         if self.db_column is None:
             self.db_column = name
-        self.field_name = name + '_enc'
+        self.field_name = name
         super(EncryptedField, self).contribute_to_class(cls, self.field_name)
-        setattr(cls, name, property(self.get_data, self.set_data))
+        setattr(cls, name + "_clear", property(self.get_data, self.set_data))
 
     def get_data(self, obj):
         if getattr(obj, self.field_name):
@@ -63,4 +63,4 @@ class EncryptedField(models.TextField):
         else:
             setattr(obj, self.field_name, None)
 
-add_introspection_rules([], ["^monprojet.fields.EncryptedField"])
+add_introspection_rules([], ["^monprojet.fields.EncryptedField"])  # remove this line for django >= 1.7
